@@ -2,51 +2,48 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"os"
 
 	"github.com/funayoseyoshito/yakiniku-image/lib"
+	"github.com/funayoseyoshito/yakiniku-image/lib/db"
 )
 
-var (
-	//StoreID 処理対象店舗ID
-	StoreID int
-	//ImgID 処理対象画像ID
-	ImgID int
-	//CMD 処理中のコマンド
-	CMD string
-)
-
-func init() {
+func main() {
 
 	var f *flag.FlagSet
+	var optionID int
 
-	switch CMD = os.Args[1]; CMD {
+	dbSet := db.GetDatabaseSet(
+		lib.Config.Database.User,
+		lib.Config.Database.Password,
+		lib.Config.Database.Host,
+		lib.Config.Database.Port,
+		lib.Config.Database.Name)
+
+	switch os.Args[1] {
 	case lib.CmdInsert:
 		log.Println("更新開始")
 		f = flag.NewFlagSet(lib.CmdInsert, flag.ExitOnError)
-		f.IntVar(&StoreID, "store", 0, "insert store ID")
-
+		f.IntVar(&optionID, "store", 0, "insert store ID")
+		f.Parse(os.Args[2:])
+		//lib.InsertExecute(optionID, db)
+		lib.InsertExecute(optionID, dbSet)
 	case lib.CmdUpdate:
 		log.Println("更新開始")
 		f = flag.NewFlagSet(lib.CmdUpdate, flag.ExitOnError)
-		f.IntVar(&StoreID, "store", 0, "update store ID")
+		f.IntVar(&optionID, "store", 0, "update store ID")
+		f.Parse(os.Args[2:])
 
 	case lib.CmdDelete:
 		log.Println("削除開始")
 		f = flag.NewFlagSet(lib.CmdDelete, flag.ExitOnError)
-		f.IntVar(&ImgID, "image", 0, "delete origin ID")
+		f.IntVar(&optionID, "image", 0, "delete origin ID")
+		f.Parse(os.Args[2:])
 
 	default:
 		lib.FatalExit("コマンドを確認してください")
 	}
 
-	f.Parse(os.Args[2:])
-
-	fmt.Println("opt1:", StoreID)
-	fmt.Println("opt1:", ImgID)
-}
-
-func main() {
+	log.Println("ツール終了")
 }

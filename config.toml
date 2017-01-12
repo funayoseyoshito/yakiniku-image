@@ -1,0 +1,25 @@
+[Database]
+name      = "yakiniku_development"
+user      = "root"
+password  = "root"
+host      = "localhost"
+port      = "3306"
+
+[Logo]
+mediumName = "logo_medium.png"
+largeName  = "logo_large.png"
+originName = "logo_origin.png"
+
+[Cooking]
+originId = 100
+largeId  = 101
+mediumId = 102
+smallId  = 103
+microId  = 104
+
+[Other]
+originId = 200
+largeId  = 201
+mediumId = 202
+smallId  = 203
+microId  = 204
