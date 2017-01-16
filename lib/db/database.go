@@ -15,7 +15,7 @@ type DatabaseSet struct {
 	User, Password, Host, Port, Name string
 }
 
-func GetDatabaseSet(user string, password string, host string, port string, name string) *DatabaseSet {
+func NewDatabaseSet(user string, password string, host string, port string, name string) *DatabaseSet {
 	return &DatabaseSet{
 		User:     user,
 		Password: password,

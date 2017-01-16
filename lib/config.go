@@ -16,6 +16,10 @@ const (
 	CmdUpdate = "update"
 	//CmdDelete delete mode 定数
 	CmdDelete = "delete"
+	//CmdOptionStore -store オプション
+	CmdOptionStore = "store"
+	//CmdOptionImage -image オプション
+	CmdOptionImage = "image"
 	//AssetsDirName assets dir name
 	AssetsDirName = "assets"
 	//ImageDirName dir name
