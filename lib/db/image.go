@@ -1,14 +1,6 @@
 package db
 
-import (
-	"bytes"
-	"image/jpeg"
-	"log"
-	"time"
-
-	"fmt"
-	"image"
-)
+import "time"
 
 const SelectLimit = 10
 
@@ -18,37 +10,36 @@ type Images struct {
 	StoreID     int
 	OriginID    int
 	Kind        int
-	Source      []uint8
 	Description string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
 
-//GetOriginImage オリジナル画像のimage.Imageを取得する
-func (img Images) GetOriginImage() image.Image {
-	originImg, _, err := image.Decode(bytes.NewReader(img.Source))
-	if err != nil {
-		fmt.Println(err)
-	}
-	return originImg
-}
-
-//UpdateImage 合成画像で旧レコードを更新するメソッド
-func (img *Images) UpdateImage(imgRGBA image.Image) {
-
-	var opt jpeg.Options
-	opt.Quality = 100
-	buffer := new(bytes.Buffer)
-
-	if err := jpeg.Encode(buffer, imgRGBA, &opt); err != nil {
-		log.Println("unable to encode image.")
-	}
-	imageBytes := buffer.Bytes()
-
-	img.Source = imageBytes
-
-	//GetConnection().Save(img)
-}
+////GetOriginImage オリジナル画像のimage.Imageを取得する
+//func (img Images) GetOriginImage() image.Image {
+//	originImg, _, err := image.Decode(bytes.NewReader(img.Source))
+//	if err != nil {
+//		fmt.Println(err)
+//	}
+//	return originImg
+//}
+//
+////UpdateImage 合成画像で旧レコードを更新するメソッド
+//func (img *Images) UpdateImage(imgRGBA image.Image) {
+//
+//	var opt jpeg.Options
+//	opt.Quality = 100
+//	buffer := new(bytes.Buffer)
+//
+//	if err := jpeg.Encode(buffer, imgRGBA, &opt); err != nil {
+//		log.Println("unable to encode image.")
+//	}
+//	imageBytes := buffer.Bytes()
+//
+//	img.Source = imageBytes
+//
+//	//GetConnection().Save(img)
+//}
 
 // InsertDb テスト用の関数
 //func InsertDb(img image.Image) int {

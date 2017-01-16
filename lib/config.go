@@ -42,6 +42,8 @@ const (
 	TypeCookingName = "cooking"
 	//TypeOtherName eother type name
 	TypeOtherName = "other"
+	//SaveImageExt save image extension
+	SaveImageExt = "jpg"
 )
 
 var (
@@ -148,7 +150,7 @@ func (con *Configs) GetImageLargePath(storeID int, typeName string) string {
 	return filepath.Join(con.GetStoreImagePath(storeID), typeName, ImageLargeName)
 }
 
-//GetImageOriginPath origin image path
+//GetImagePath origin image path
 func (con *Configs) GetImageOriginPath(storeID int, typeName string) string {
 	return filepath.Join(con.GetStoreImagePath(storeID), typeName, ImageOriginName)
 }
@@ -156,6 +158,16 @@ func (con *Configs) GetImageOriginPath(storeID int, typeName string) string {
 //GetImageOriginLogoPath originLogo image path
 func (con *Configs) GetImageOriginLogoPath(storeID int, typeName string) string {
 	return filepath.Join(con.GetStoreImagePath(storeID), typeName, ImageOriginLogoName)
+}
+
+//GetImageSrcPath cooking image source dir
+func (con *Configs) GetImageSrcPath(storeID int, typeName string) string {
+	return filepath.Join(con.GetStoreImagePath(storeID), typeName)
+}
+
+//GetImageCookingSrcPath cooking image source dir
+func (con *Configs) GetImageCookingSrcPath(storeID int) string {
+	return filepath.Join(con.GetStoreImagePath(storeID), TypeCookingName)
 }
 
 //GetImageCookingMicroPath cooking micro image path
@@ -180,12 +192,17 @@ func (con *Configs) GetImageCookingLargePath(storeID int) string {
 
 //GetImageCookingOriginPath cooking origin image path
 func (con *Configs) GetImageCookingOriginPath(storeID int) string {
-	return con.GetImageOriginLogoPath(storeID, TypeCookingName)
+	return con.GetImageOriginPath(storeID, TypeCookingName)
 }
 
 //GetImageCookingOriginLogoPath cooking origin logo path
 func (con *Configs) GetImageCookingOriginLogoPath(storeID int) string {
 	return con.GetImageOriginLogoPath(storeID, TypeCookingName)
+}
+
+//GetImageOtherSrcPath other image source dir
+func (con *Configs) GetImageOtherSrcPath(storeID int) string {
+	return filepath.Join(con.GetStoreImagePath(storeID), TypeCookingName)
 }
 
 //GetImageOtherMicroPath other micro image path
@@ -210,7 +227,7 @@ func (con *Configs) GetImageOtherLargePath(storeID int) string {
 
 //GetImageOtherOriginPath other origin image path
 func (con *Configs) GetImageOtherOriginPath(storeID int) string {
-	return con.GetImageOriginLogoPath(storeID, TypeOtherName)
+	return con.GetImageOriginPath(storeID, TypeOtherName)
 }
 
 //GetImageOtherOriginLogoPath other origin logo path

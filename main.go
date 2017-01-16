@@ -28,7 +28,7 @@ func main() {
 
 	switch os.Args[1] {
 	case lib.CmdInsert:
-		log.Println("更新開始")
+		log.Println("INSERT 開始")
 		f = flag.NewFlagSet(lib.CmdInsert, flag.ExitOnError)
 		f.IntVar(&optionID, "store", 0, lib.CmdOptionStore+" store id")
 		f.Parse(os.Args[2:])
@@ -36,14 +36,14 @@ func main() {
 		lib.InsertExecute(optionID, dbSet)
 
 	case lib.CmdUpdate:
-		log.Println("更新開始")
+		log.Println("UPDATE 開始")
 		f = flag.NewFlagSet(lib.CmdUpdate, flag.ExitOnError)
 		f.IntVar(&optionID, "store", 0, "update store ID")
 		f.Parse(os.Args[2:])
 		checkOptionEmpty(lib.CmdOptionImage)
 
 	case lib.CmdDelete:
-		log.Println("削除開始")
+		log.Println("DELETE 開始")
 		f = flag.NewFlagSet(lib.CmdDelete, flag.ExitOnError)
 		f.IntVar(&optionID, "image", 0, "delete origin ID")
 		f.Parse(os.Args[2:])
