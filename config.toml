@@ -16,6 +16,7 @@ largeId  = 101
 mediumId = 102
 smallId  = 103
 microId  = 104
+originNoLogoID = 111
 
 [Other]
 originId = 200
@@ -23,3 +24,9 @@ largeId  = 201
 mediumId = 202
 smallId  = 203
 microId  = 204
+originNoLogoID = 222
+
+[aws]
+bucketName = ""
+accessKeyID = ""
+secretAccessKey = ""

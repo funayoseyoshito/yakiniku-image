@@ -36,14 +36,18 @@ const (
 	ImageLargeName = "large"
 	//ImageOriginName origin dir name
 	ImageOriginName = "origin"
-	//ImageOriginLogoName origin logo dir name
-	ImageOriginLogoName = "origin_logo"
+	//ImageOriginNoLogoName origin no logo dir name
+	ImageOriginNoLogoName = "origin_nologo"
 	//TypeCookingName cooking type name
 	TypeCookingName = "cooking"
 	//TypeOtherName eother type name
 	TypeOtherName = "other"
 	//SaveImageExt save image extension
-	SaveImageExt = "jpg"
+	SaveImageExt = "jpeg"
+	//SaveImageQuality is image quality
+	SaveOriginImageQuality = 100
+	//SaveNoOriginImageQuality is image quality
+	SaveNoOriginImageQuality = 50
 )
 
 var (
@@ -59,6 +63,7 @@ type Configs struct {
 	Logo     LogoConfig
 	Cooking  CookingConfig
 	Other    OtherConfig
+	Aws      AwsConfig
 }
 
 //DatabaseConfig database 設定ファイル
@@ -79,20 +84,62 @@ type LogoConfig struct {
 
 //CookingConfig 料理画像の設定
 type CookingConfig struct {
-	OriginID int
-	LargeID  int
-	MediumID int
-	SmallID  int
-	MicroID  int
+	OriginID       int
+	LargeID        int
+	MediumID       int
+	SmallID        int
+	MicroID        int
+	OriginNoLogoID int
 }
 
 //OtherConfig その他画像の設定
 type OtherConfig struct {
-	OriginID int
-	LargeID  int
-	MediumID int
-	SmallID  int
-	MicroID  int
+	OriginID       int
+	LargeID        int
+	MediumID       int
+	SmallID        int
+	MicroID        int
+	OriginNoLogoID int
+}
+
+//AwsConfig awsの設定
+type AwsConfig struct {
+	bucketName      string
+	accessKeyID     string
+	secretAccessKey string
+}
+
+//GetAwsBucketName is get aws bucket name by toml or env
+func (con *AwsConfig) GetAwsBucketName() string {
+	var result string
+	if result = con.bucketName; result == "" {
+		if result = os.Getenv("AwsBucketName"); result == "" {
+			FatalExit("awsのbucket nameが設定されていません")
+		}
+	}
+	return result
+}
+
+//GetAwsAccessKeyID is get aws accesskeyID by toml or env
+func (con *AwsConfig) GetAwsAccessKeyID() string {
+	var result string
+	if result = con.accessKeyID; result == "" {
+		if result = os.Getenv("AwsAccessKeyID"); result == "" {
+			FatalExit("awsのaccesskeyIDが設定されていません")
+		}
+	}
+	return result
+}
+
+//GetAwsSecretAccessKey is get aws SecretAccesskey by toml or env
+func (con *AwsConfig) GetAwsSecretAccessKey() string {
+	var result string
+	if result = con.secretAccessKey; result == "" {
+		if result = os.Getenv("AwsSecretAccessKey"); result == "" {
+			FatalExit("awsのsecret access keyが設定されていません")
+		}
+	}
+	return result
 }
 
 //GetAssetsPath assets path
@@ -107,17 +154,17 @@ func (con *Configs) GetLogoPath() string {
 
 //GetMediumLogoPath mediumLogo path
 func (con *Configs) GetMediumLogoPath() string {
-	return filepath.Join(con.GetLargeLogoPath(), con.Logo.MediumName)
+	return filepath.Join(con.GetLogoPath(), con.Logo.MediumName)
 }
 
 //GetLargeLogoPath largeLogo path
 func (con *Configs) GetLargeLogoPath() string {
-	return filepath.Join(con.GetLargeLogoPath(), con.Logo.LargeName)
+	return filepath.Join(con.GetLogoPath(), con.Logo.LargeName)
 }
 
 //GetOriginLogoPath originLogo path
 func (con *Configs) GetOriginLogoPath() string {
-	return filepath.Join(con.GetLargeLogoPath(), con.Logo.OriginName)
+	return filepath.Join(con.GetLogoPath(), con.Logo.OriginName)
 }
 
 //GetImagePath image dir path
@@ -155,9 +202,9 @@ func (con *Configs) GetImageOriginPath(storeID int, typeName string) string {
 	return filepath.Join(con.GetStoreImagePath(storeID), typeName, ImageOriginName)
 }
 
-//GetImageOriginLogoPath originLogo image path
-func (con *Configs) GetImageOriginLogoPath(storeID int, typeName string) string {
-	return filepath.Join(con.GetStoreImagePath(storeID), typeName, ImageOriginLogoName)
+//GetImageOriginNoLogoPath originLogo image path
+func (con *Configs) GetImageOriginNoLogoPath(storeID int, typeName string) string {
+	return filepath.Join(con.GetStoreImagePath(storeID), typeName, ImageOriginNoLogoName)
 }
 
 //GetImageSrcPath cooking image source dir
@@ -197,7 +244,7 @@ func (con *Configs) GetImageCookingOriginPath(storeID int) string {
 
 //GetImageCookingOriginLogoPath cooking origin logo path
 func (con *Configs) GetImageCookingOriginLogoPath(storeID int) string {
-	return con.GetImageOriginLogoPath(storeID, TypeCookingName)
+	return con.GetImageOriginNoLogoPath(storeID, TypeCookingName)
 }
 
 //GetImageOtherSrcPath other image source dir
@@ -232,7 +279,7 @@ func (con *Configs) GetImageOtherOriginPath(storeID int) string {
 
 //GetImageOtherOriginLogoPath other origin logo path
 func (con *Configs) GetImageOtherOriginLogoPath(storeID int) string {
-	return con.GetImageOriginLogoPath(storeID, TypeOtherName)
+	return con.GetImageOriginNoLogoPath(storeID, TypeOtherName)
 }
 
 func init() {
