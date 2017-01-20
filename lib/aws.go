@@ -31,12 +31,51 @@ type AwsIni struct {
 }
 
 //SaveImageToS3 is save image to s3 object
-func (this *AwsIni) SaveImageToS3(imgID int, img *image.Image, imgQuality int, public bool) {
+func (this *AwsIni) SaveImageRGBAToS3(imgID int, img *image.Image, imgQuality int, public bool) {
 	var opt jpeg.Options
 	opt.Quality = imgQuality
 
 	buffer := new(bytes.Buffer)
 	if err := jpeg.Encode(buffer, *img, &opt); err != nil {
+		log.Println("unable to encode image.")
+	}
+
+	sess, err := session.NewSession(&aws.Config{
+		Region:      aws.String("ap-northeast-1"),
+		Credentials: credentials.NewStaticCredentials(this.AccessKeyID, this.SecretAccessKey, ""),
+	})
+
+	if err != nil {
+		FatalExit(err)
+	}
+
+	uploader := s3manager.NewUploader(sess)
+
+	s3Input := &s3manager.UploadInput{
+		Bucket:      aws.String(Config.Aws.GetAwsBucketName()),
+		Key:         aws.String(strconv.Itoa(imgID) + "." + SaveImageExt),
+		Body:        bytes.NewBuffer(buffer.Bytes()),
+		ContentType: aws.String("image/jpeg"),
+	}
+
+	if public {
+		s3Input.ACL = aws.String("public-read")
+	}
+
+	_, err = uploader.Upload(s3Input)
+
+	if err != nil {
+		FatalExit(err)
+	}
+}
+
+//SaveImageToS3 is save image to s3 object
+func (this *AwsIni) SaveImageToS3(imgID int, img image.Image, imgQuality int, public bool) {
+	var opt jpeg.Options
+	opt.Quality = imgQuality
+
+	buffer := new(bytes.Buffer)
+	if err := jpeg.Encode(buffer, img, &opt); err != nil {
 		log.Println("unable to encode image.")
 	}
 

@@ -1,6 +1,10 @@
 package db
 
-import "time"
+import (
+	"time"
+
+	"github.com/jinzhu/gorm"
+)
 
 const SelectLimit = 10
 
@@ -14,6 +18,31 @@ type Images struct {
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
+
+func (i *Images) Create(db *gorm.DB) {
+	db.Create(i)
+}
+
+//var animal = Animal{Age: 99, Name: ""}
+//db.Create(&animal)
+
+// InsertDb テスト用の関数
+//func InsertDb(img image.Image) int {
+//
+//	var opt jpeg.Options
+//	opt.Quality = 100
+//	buffer := new(bytes.Buffer)
+//
+//	if err := jpeg.Encode(buffer, img, &opt); err != nil {
+//		log.Println("unable to encode image.")
+//	}
+//
+//	imageBytes := buffer.Bytes()
+//	row := Images{StoreID: 1111, Kind: 1111, Source: imageBytes, OriginID: 1111}
+//	GetConnection().Create(&row)
+//
+//	return row.ID
+//}
 
 ////GetOriginImage オリジナル画像のimage.Imageを取得する
 //func (img Images) GetOriginImage() image.Image {
@@ -39,24 +68,6 @@ type Images struct {
 //	img.Source = imageBytes
 //
 //	//GetConnection().Save(img)
-//}
-
-// InsertDb テスト用の関数
-//func InsertDb(img image.Image) int {
-//
-//	var opt jpeg.Options
-//	opt.Quality = 100
-//	buffer := new(bytes.Buffer)
-//
-//	if err := jpeg.Encode(buffer, img, &opt); err != nil {
-//		log.Println("unable to encode image.")
-//	}
-//
-//	imageBytes := buffer.Bytes()
-//	row := Images{StoreID: 1111, Kind: 1111, Source: imageBytes, OriginID: 1111}
-//	GetConnection().Create(&row)
-//
-//	return row.ID
 //}
 
 //SelectProcessingRows 処理対象のレコードを定数ずつ取得する

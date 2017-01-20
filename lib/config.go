@@ -26,21 +26,21 @@ const (
 	ImageDirName = "image"
 	//LogoDirName logo dir name
 	LogoDirName = "logo"
-	//ImageMicroName micro dir name
+	//ImageMicroName micro kind name
 	ImageMicroName = "micro"
-	//ImageSmallName small dir name
+	//ImageSmallName small kind name
 	ImageSmallName = "small"
-	//ImageMediumName medium dir name
+	//ImageMediumName medium kind name
 	ImageMediumName = "medium"
-	//ImageLargeName large dir name
+	//ImageLargeName large kind name
 	ImageLargeName = "large"
-	//ImageOriginName origin dir name
+	//ImageOriginName origin kind name
 	ImageOriginName = "origin"
-	//ImageOriginNoLogoName origin no logo dir name
+	//ImageOriginNoLogoName origin no logo kind name
 	ImageOriginNoLogoName = "origin_nologo"
 	//TypeCookingName cooking type name
 	TypeCookingName = "cooking"
-	//TypeOtherName eother type name
+	//TypeOtherName other type name
 	TypeOtherName = "other"
 	//SaveImageExt save image extension
 	SaveImageExt = "jpeg"
@@ -282,11 +282,109 @@ func (con *Configs) GetImageOtherOriginLogoPath(storeID int) string {
 	return con.GetImageOriginNoLogoPath(storeID, TypeOtherName)
 }
 
+//GetImageKindNameByKind
+func (con *Configs) GetImageKindNameByKind(kind int) string {
+	var kindName string
+
+	switch kind {
+	case con.Cooking.OriginNoLogoID, con.Other.OriginNoLogoID:
+		kindName = ImageOriginNoLogoName
+	case con.Cooking.OriginID, con.Other.OriginID:
+		kindName = ImageOriginName
+	case con.Cooking.LargeID, con.Other.LargeID:
+		kindName = ImageLargeName
+	case con.Cooking.MediumID, con.Other.MediumID:
+		kindName = ImageMediumName
+	case con.Cooking.SmallID, con.Other.SmallID:
+		kindName = ImageSmallName
+	case con.Cooking.MicroID, con.Other.MicroID:
+		kindName = ImageMicroName
+	default:
+		FatalExit("画像種類名が取得できませんでした。")
+	}
+
+	return kindName
+}
+
+//getKindByName get kind from config
+func (cook *CookingConfig) getKindByName(name string) int {
+	var kind int
+
+	switch name {
+	case ImageOriginNoLogoName:
+		kind = cook.OriginNoLogoID
+	case ImageOriginName:
+		kind = cook.OriginID
+	case ImageLargeName:
+		kind = cook.LargeID
+	case ImageMediumName:
+		kind = cook.MediumID
+	case ImageSmallName:
+		kind = cook.SmallID
+	case ImageMicroName:
+		kind = cook.MicroID
+	}
+	return kind
+}
+
+//getKindByName get kind from config
+func (other *OtherConfig) getKingByName(name string) int {
+	var kind int
+
+	switch name {
+	case ImageOriginNoLogoName:
+		kind = other.OriginNoLogoID
+	case ImageOriginName:
+		kind = other.OriginID
+	case ImageLargeName:
+		kind = other.LargeID
+	case ImageMediumName:
+		kind = other.MediumID
+	case ImageSmallName:
+		kind = other.SmallID
+	case ImageMicroName:
+		kind = other.MicroID
+	}
+	return kind
+}
+
+//GetImageKindByKindNameAndTypeName
+func (con *Configs) GetKindByKindNameAndTypeName(kindN string, typeN string) int {
+	var kind int
+
+	if typeN == TypeCookingName {
+		kind = con.Cooking.getKindByName(kindN)
+	} else {
+		kind = con.Other.getKingByName(kindN)
+	}
+
+	return kind
+}
+
+//GetImageTypeByKind return kind name
+func (con *Configs) GetImageTypeByKind(kind int) string {
+
+	var typeName string
+
+	switch kind {
+	case con.Cooking.OriginNoLogoID, con.Cooking.OriginID, con.Cooking.LargeID,
+		con.Cooking.MediumID, con.Cooking.MicroID, con.Cooking.SmallID:
+		typeName = TypeCookingName
+	case con.Other.OriginNoLogoID, con.Other.OriginID, con.Other.LargeID,
+		con.Other.MediumID, con.Other.MicroID, con.Other.SmallID:
+		typeName = TypeOtherName
+	default:
+		FatalExit("logo kind が一致しませんでした。")
+	}
+	return typeName
+}
+
 func init() {
 	_, err := toml.DecodeFile("./config.toml", &Config)
 	if err != nil {
 		FatalExit(err)
 	}
+
 	basePath, _ := os.Getwd()
 	CurrentBasePath = basePath
 }

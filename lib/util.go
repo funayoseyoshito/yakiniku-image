@@ -4,6 +4,8 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
+	"strconv"
 )
 
 //FatalExit is output Fatal error and exit program
@@ -32,4 +34,17 @@ func ReadDir(path string) []os.FileInfo {
 		FatalExit(err)
 	}
 	return list
+}
+
+//MoveProcessed
+func MoveProcessedImage(storeID int, imageType string, fileName string, dbID int) {
+	FileMove(filepath.Join(Config.GetImageSrcPath(storeID, imageType), fileName),
+		filepath.Join(Config.GetImageOriginNoLogoPath(storeID, imageType), strconv.Itoa(dbID)+"."+SaveImageExt))
+}
+
+//FileMove is move ファイル
+func FileMove(source string, target string) {
+	if err := os.Rename(source, target); err != nil {
+		FatalExit(err)
+	}
 }
