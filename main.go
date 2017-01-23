@@ -53,7 +53,7 @@ func main() {
 		lib.FatalExit("コマンドを確認してください")
 	}
 
-	log.Println("ツール終了")
+	log.Printf("\n\nツール終了")
 }
 
 //checkOptionEmpty オプションが正しく渡されているかチェックする

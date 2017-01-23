@@ -15,6 +15,7 @@ type Images struct {
 	OriginID    int
 	Kind        int
 	Description string
+	Order       int
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }

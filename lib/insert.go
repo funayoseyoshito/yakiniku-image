@@ -12,6 +12,7 @@ import (
 	"log"
 
 	"github.com/funayoseyoshito/yakiniku-image/lib/db"
+	"github.com/nfnt/resize"
 )
 
 var logo *LogoImages
@@ -27,80 +28,125 @@ func init() {
 		AccessKeyID:     Config.Aws.GetAwsAccessKeyID(),
 		SecretAccessKey: Config.Aws.GetAwsSecretAccessKey(),
 		S3BucketName:    Config.Aws.GetAwsBucketName()}
-	//panic("")
 }
 
 //InsertExecute is main
 func InsertExecute(storeID int, dbSet *db.DatabaseSet) {
 
 	fmt.Println(storeID)
+	defer dbSet.Connection().Close()
+
 	checkAndMakeDir(storeID)
 
 	//SaveToS3()
 	types := []string{TypeCookingName, TypeOtherName}
 	for _, imageType := range types {
 
-		fmt.Println(imageType)
-		fmt.Println(Config.GetImageSrcPath(storeID, imageType))
-
 		list := ReadDir(Config.GetImageSrcPath(storeID, imageType))
 		for _, finfo := range list {
-
 			r, _ := regexp.Compile(`^([0-9]+)\.(JPG|jpg|jpeg|JPEG)$`)
 			fileInfoArray := r.FindAllStringSubmatch(finfo.Name(), -1)
 			if len(fileInfoArray) != 1 || len(fileInfoArray[0]) != 3 {
 				continue
 			}
+
+			fmt.Println(imageType)
+			fmt.Println(Config.GetImageSrcPath(storeID, imageType))
+			log.Println("------------------------------------")
+
 			var originId int
 			var order int
+
 			order, _ = strconv.Atoi(fileInfoArray[0][1])
+			originNoLogoImage := *GetImageByPath(filepath.Join(Config.GetImageSrcPath(storeID, imageType), finfo.Name()))
+
 			fmt.Println(finfo.Name(), order)
 
-			//origin_nologo
-			//TODO: Orderを登録する
+			// -------------------
+			//origin
+			// -------------------
+			kind := Config.GetKindByKindNameAndTypeName(ImageOriginName, imageType)
+			mixedOriginImg := logo.LogoMixImageRGBA(kind, originNoLogoImage)
 			imageTable := &db.Images{
 				StoreID: storeID,
-				Kind:    Config.GetKindByKindNameAndTypeName(ImageOriginNoLogoName, imageType)}
-
+				Kind:    kind,
+				Order:   order,
+			}
 			imageTable.Create(dbSet.Connection())
 			originId = imageTable.ID
-			originId = imageTable.ID
-			fmt.Println(originId)
-			originNoLogoImage := *GetImageByPath(filepath.Join(Config.GetImageSrcPath(storeID, imageType), finfo.Name()))
-			yakinikuAws.SaveImageToS3(imageTable.ID, originNoLogoImage, SaveOriginImageQuality, S3ACLPrivate)
+			yakinikuAws.SaveImageToS3(originId, mixedOriginImg, SaveImageQuality50, S3ACLPublic)
+			SaveImageToFile(mixedOriginImg, kind, imageTable.ID, storeID)
+			log.Println(ImageOriginName, originId)
 
-			//TODO: 一旦移動ロジックをコメントアウト
-			//MoveProcessedImage(storeID, imageType, finfo.Name(), originId)
+			// -------------------
+			//origin_nologo
+			// -------------------
+			MoveProcessedImage(storeID, imageType, finfo.Name(), originId)
 			log.Println(ImageOriginNoLogoName)
-			//origin
-			//TODO: Orderを登録する
-			kind := Config.GetKindByKindNameAndTypeName(ImageOriginName, imageType)
+
+			// -------------------
+			//Large
+			// -------------------
+			kind = Config.GetKindByKindNameAndTypeName(ImageLargeName, imageType)
 			imageTable = &db.Images{
 				StoreID:  storeID,
 				Kind:     kind,
 				OriginID: originId,
-				//Order: orderId
+				Order:    order,
 			}
-
 			imageTable.Create(dbSet.Connection())
-			mixedImg := logo.LogoMixImageRGBA(kind, originNoLogoImage)
-			yakinikuAws.SaveImageToS3(imageTable.ID, mixedImg, SaveNoOriginImageQuality, S3ACLPublic)
-			SaveImageToFile(mixedImg, kind, imageTable.ID, storeID)
-			log.Println(ImageOriginName)
-			panic("===========================")
-			//mixedImg := logo.LogoMixImageRGBA(Config.Cooking.OriginID, originImg)
+			mixedImage := resize.Thumbnail(uint(Config.ImageSize.LargeWidth), uint(Config.ImageSize.LargeHeight), mixedOriginImg, resize.Lanczos3)
+			yakinikuAws.SaveImageToS3(imageTable.ID, mixedImage, SaveImageQuality100, S3ACLPublic)
+			SaveImageToFile(mixedImage, kind, imageTable.ID, storeID)
+			log.Println(ImageLargeName, imageTable.ID)
 
-			//var mixed Image image.Image = logo.LogoMixImageRGBA(Config.Cooking.OriginID, originImg)
-			//fmt.Printf("%T")
+			// -------------------
+			//Medium
+			// -------------------
+			kind = Config.GetKindByKindNameAndTypeName(ImageMediumName, imageType)
+			imageTable = &db.Images{
+				StoreID:  storeID,
+				Kind:     kind,
+				OriginID: originId,
+				Order:    order,
+			}
+			imageTable.Create(dbSet.Connection())
+			mixedImage = resize.Thumbnail(uint(Config.ImageSize.MediumWidth), uint(Config.ImageSize.MediumHeight), mixedOriginImg, resize.Lanczos3)
+			yakinikuAws.SaveImageToS3(imageTable.ID, mixedImage, SaveImageQuality100, S3ACLPublic)
+			SaveImageToFile(mixedImage, kind, imageTable.ID, storeID)
+			log.Println(ImageMediumName, imageTable.ID)
 
-			//Config.Cooking.MediumID
-			//origin
-			//origin logo
-			//large
-			//medium
-			//small
+			// -------------------
+			//Small
+			// -------------------
+			kind = Config.GetKindByKindNameAndTypeName(ImageSmallName, imageType)
+			imageTable = &db.Images{
+				StoreID:  storeID,
+				Kind:     kind,
+				OriginID: originId,
+				Order:    order,
+			}
+			imageTable.Create(dbSet.Connection())
+			mixedImage = resize.Thumbnail(uint(Config.ImageSize.SmallWidth), uint(Config.ImageSize.SmallHeight), originNoLogoImage, resize.Lanczos3)
+			yakinikuAws.SaveImageToS3(imageTable.ID, mixedImage, SaveImageQuality100, S3ACLPublic)
+			SaveImageToFile(mixedImage, kind, imageTable.ID, storeID)
+			log.Println(ImageSmallName, imageTable.ID)
+
+			// -------------------
 			//micro
-			//fmt.println(originimg)
+			// -------------------
+			kind = Config.GetKindByKindNameAndTypeName(ImageMicroName, imageType)
+			imageTable = &db.Images{
+				StoreID:  storeID,
+				Kind:     kind,
+				OriginID: originId,
+				Order:    order,
+			}
+			imageTable.Create(dbSet.Connection())
+			mixedImage = resize.Thumbnail(uint(Config.ImageSize.MicroWidth), uint(Config.ImageSize.MicroHeight), originNoLogoImage, resize.Lanczos3)
+			yakinikuAws.SaveImageToS3(imageTable.ID, mixedImage, SaveImageQuality100, S3ACLPublic)
+			SaveImageToFile(mixedImage, kind, imageTable.ID, storeID)
+			log.Println(ImageMicroName, imageTable.ID)
 		}
 	}
 }

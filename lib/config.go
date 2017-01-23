@@ -45,9 +45,9 @@ const (
 	//SaveImageExt save image extension
 	SaveImageExt = "jpeg"
 	//SaveImageQuality is image quality
-	SaveOriginImageQuality = 100
+	SaveImageQuality100 = 100
 	//SaveNoOriginImageQuality is image quality
-	SaveNoOriginImageQuality = 50
+	SaveImageQuality50 = 50
 )
 
 var (
@@ -59,11 +59,12 @@ var (
 
 //Configs 設定ファイル
 type Configs struct {
-	Database DatabaseConfig
-	Logo     LogoConfig
-	Cooking  CookingConfig
-	Other    OtherConfig
-	Aws      AwsConfig
+	Database  DatabaseConfig
+	Logo      LogoConfig
+	Cooking   CookingConfig
+	Other     OtherConfig
+	ImageSize ImageSizeConfig
+	Aws       AwsConfig
 }
 
 //DatabaseConfig database 設定ファイル
@@ -104,15 +105,27 @@ type OtherConfig struct {
 
 //AwsConfig awsの設定
 type AwsConfig struct {
-	bucketName      string
-	accessKeyID     string
-	secretAccessKey string
+	BucketName      string
+	AccessKeyID     string
+	SecretAccessKey string
+}
+
+//ImageSizeConfig define image size
+type ImageSizeConfig struct {
+	LargeWidth   int
+	LargeHeight  int
+	MediumWidth  int
+	MediumHeight int
+	SmallWidth   int
+	SmallHeight  int
+	MicroWidth   int
+	MicroHeight  int
 }
 
 //GetAwsBucketName is get aws bucket name by toml or env
 func (con *AwsConfig) GetAwsBucketName() string {
 	var result string
-	if result = con.bucketName; result == "" {
+	if result = con.BucketName; result == "" {
 		if result = os.Getenv("AwsBucketName"); result == "" {
 			FatalExit("awsのbucket nameが設定されていません")
 		}
@@ -123,7 +136,7 @@ func (con *AwsConfig) GetAwsBucketName() string {
 //GetAwsAccessKeyID is get aws accesskeyID by toml or env
 func (con *AwsConfig) GetAwsAccessKeyID() string {
 	var result string
-	if result = con.accessKeyID; result == "" {
+	if result = con.AccessKeyID; result == "" {
 		if result = os.Getenv("AwsAccessKeyID"); result == "" {
 			FatalExit("awsのaccesskeyIDが設定されていません")
 		}
@@ -134,7 +147,7 @@ func (con *AwsConfig) GetAwsAccessKeyID() string {
 //GetAwsSecretAccessKey is get aws SecretAccesskey by toml or env
 func (con *AwsConfig) GetAwsSecretAccessKey() string {
 	var result string
-	if result = con.secretAccessKey; result == "" {
+	if result = con.SecretAccessKey; result == "" {
 		if result = os.Getenv("AwsSecretAccessKey"); result == "" {
 			FatalExit("awsのsecret access keyが設定されていません")
 		}

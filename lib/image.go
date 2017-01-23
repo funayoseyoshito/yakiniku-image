@@ -107,6 +107,6 @@ func SaveImageToFile(img image.Image, imageKind int, insertID int, storeID int) 
 	}
 
 	var opt jpeg.Options
-	opt.Quality = SaveNoOriginImageQuality
+	opt.Quality = SaveImageQuality50
 	jpeg.Encode(out, img, &opt)
 }

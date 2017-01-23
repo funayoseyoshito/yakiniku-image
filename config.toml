@@ -26,6 +26,16 @@ smallId  = 203
 microId  = 204
 originNoLogoID = 222
 
+[ImageSize]
+largeWidth   = 700
+largeHeight  = 700
+mediumWidth  = 500
+mediumHeight = 500
+smallWidth   = 300
+smallHeight  = 300
+microWidth   = 100
+microHeight  = 100
+
 [aws]
 bucketName = ""
 accessKeyID = ""
