@@ -55,7 +55,7 @@ func (logo *LogoImages) GetLogoImageByKind(kind int) *image.Image {
 func (logo *LogoImages) LogoMixImageRGBA(kind int, originImg image.Image) image.Image {
 	o := originImg
 	l := *logo.GetLogoImageByKind(kind)
-	startPointLogo := image.Point{o.Bounds().Dx() - l.Bounds().Dx() - 10, o.Bounds().Dy() - l.Bounds().Dy() - 10}
+	startPointLogo := image.Point{o.Bounds().Dx() - l.Bounds().Dx() - 50, o.Bounds().Dy() - l.Bounds().Dy() - 50}
 	logoRectangle := image.Rectangle{startPointLogo, startPointLogo.Add(l.Bounds().Size())}
 	originRectangle := image.Rectangle{image.Point{0, 0}, o.Bounds().Size()}
 
