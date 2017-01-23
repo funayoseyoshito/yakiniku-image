@@ -15,14 +15,9 @@ import (
 	"github.com/nfnt/resize"
 )
 
-var logo *LogoImages
 var yakinikuAws *AwsIni
 
-//var aws *AwsIni
-
 func init() {
-
-	logo = NewLogos()
 
 	yakinikuAws = &AwsIni{
 		AccessKeyID:     Config.Aws.GetAwsAccessKeyID(),
@@ -35,6 +30,7 @@ func InsertExecute(storeID int, dbSet *db.DatabaseSet) {
 
 	fmt.Println(storeID)
 	defer dbSet.Connection().Close()
+	logo := GetLogo()
 
 	checkAndMakeDir(storeID)
 
@@ -66,7 +62,7 @@ func InsertExecute(storeID int, dbSet *db.DatabaseSet) {
 			//origin
 			// -------------------
 			kind := Config.GetKindByKindNameAndTypeName(ImageOriginName, imageType)
-			mixedOriginImg := logo.LogoMixImageRGBA(kind, originNoLogoImage)
+			mixedOriginImg := LogoMixImageRGBA(kind, originNoLogoImage, logo)
 			imageTable := &db.Images{
 				StoreID: storeID,
 				Kind:    kind,

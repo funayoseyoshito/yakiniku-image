@@ -78,7 +78,6 @@ type DatabaseConfig struct {
 
 //LogoConfig logo画像の設定
 type LogoConfig struct {
-	MediumName string
 	LargeName  string
 	OriginName string
 }
@@ -165,10 +164,10 @@ func (con *Configs) GetLogoPath() string {
 	return filepath.Join(con.GetAssetsPath(), LogoDirName)
 }
 
-//GetMediumLogoPath mediumLogo path
-func (con *Configs) GetMediumLogoPath() string {
-	return filepath.Join(con.GetLogoPath(), con.Logo.MediumName)
-}
+////GetMediumLogoPath mediumLogo path
+//func (con *Configs) GetMediumLogoPath() string {
+//	return filepath.Join(con.GetLogoPath(), con.Logo.MediumName)
+//}
 
 //GetLargeLogoPath largeLogo path
 func (con *Configs) GetLargeLogoPath() string {

@@ -6,8 +6,6 @@ host      = "localhost"
 port      = "3306"
 
 [Logo]
-mediumName = "logo_medium.png"
-largeName  = "logo_large.png"
 originName = "logo_origin.png"
 
 [Cooking]

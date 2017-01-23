@@ -23,38 +23,14 @@ func init() {
 	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
 }
 
-//SrcImage is source image struct
-type SrcImage struct {
-	kind int
-}
-
 //NewLogos return LogoImages struct pointer
-func NewLogos() *LogoImages {
-	return &LogoImages{
-		OriginLogo: GetImageByPath(Config.GetOriginLogoPath()),
-		LargeLogo:  GetImageByPath(Config.GetLargeLogoPath()),
-		MediumLogo: GetImageByPath(Config.GetMediumLogoPath())}
+func GetLogo() *image.Image {
+	return GetImageByPath(Config.GetOriginLogoPath())
 }
 
-//GetLgoImageByKind return logo pointer
-func (logo *LogoImages) GetLogoImageByKind(kind int) *image.Image {
-	var l *image.Image
-	switch kind {
-	case Config.Cooking.OriginID, Config.Other.OriginID:
-		l = logo.OriginLogo
-	case Config.Cooking.LargeID, Config.Other.LargeID:
-		l = logo.LargeLogo
-	case Config.Cooking.MediumID, Config.Other.MediumID:
-		l = logo.MediumLogo
-	default:
-		FatalExit("logo kind が一致しませんでした。")
-	}
-	return l
-}
-
-func (logo *LogoImages) LogoMixImageRGBA(kind int, originImg image.Image) image.Image {
+func LogoMixImageRGBA(kind int, originImg image.Image, logo *image.Image) image.Image {
 	o := originImg
-	l := *logo.GetLogoImageByKind(kind)
+	l := *logo
 	startPointLogo := image.Point{o.Bounds().Dx() - l.Bounds().Dx() - 50, o.Bounds().Dy() - l.Bounds().Dy() - 50}
 	logoRectangle := image.Rectangle{startPointLogo, startPointLogo.Add(l.Bounds().Size())}
 	originRectangle := image.Rectangle{image.Point{0, 0}, o.Bounds().Size()}
