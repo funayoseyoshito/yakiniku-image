@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 
+	"fmt"
+
 	"github.com/funayoseyoshito/yakiniku-image/lib"
 	"github.com/funayoseyoshito/yakiniku-image/lib/db"
 )
@@ -22,25 +24,30 @@ func main() {
 		lib.Config.Database.Port,
 		lib.Config.Database.Name)
 
+	awsSet := lib.NewAws()
+
 	if len(os.Args) < 1 {
 		lib.FatalExit("コマンドを確認してください")
 	}
+
+	fmt.Println("#####################################################################")
 
 	switch os.Args[1] {
 	case lib.CmdInsert:
 		log.Println("INSERT 開始")
 		f = flag.NewFlagSet(lib.CmdInsert, flag.ExitOnError)
-		f.IntVar(&optionID, "store", 0, lib.CmdOptionStore+" store id")
+		f.IntVar(&optionID, "store", 0, lib.CmdOptionStore+" store ID")
 		f.Parse(os.Args[2:])
 		checkOptionEmpty(lib.CmdOptionStore)
-		lib.InsertExecute(optionID, dbSet)
+		lib.InsertExecute(optionID, dbSet, awsSet)
 
 	case lib.CmdUpdate:
 		log.Println("UPDATE 開始")
 		f = flag.NewFlagSet(lib.CmdUpdate, flag.ExitOnError)
-		f.IntVar(&optionID, "store", 0, "update store ID")
+		f.IntVar(&optionID, "store", 0, lib.CmdUpdate+" store ID")
 		f.Parse(os.Args[2:])
 		checkOptionEmpty(lib.CmdOptionImage)
+		lib.UpdateExecute(optionID, dbSet, awsSet)
 
 	case lib.CmdDelete:
 		log.Println("DELETE 開始")
@@ -53,7 +60,8 @@ func main() {
 		lib.FatalExit("コマンドを確認してください")
 	}
 
-	log.Printf("\n\nツール終了")
+	log.Println("終了")
+	fmt.Println("#####################################################################")
 }
 
 //checkOptionEmpty オプションが正しく渡されているかチェックする

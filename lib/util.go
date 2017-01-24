@@ -48,3 +48,46 @@ func FileMove(source string, target string) {
 		FatalExit(err)
 	}
 }
+
+//checkAndMakeDir 構成ディレクトリパスのチェックと作成
+func CheckAndMakeDir(storeID int) {
+	//cooking
+	if !CheckFilePathExists(Config.GetImageCookingOriginPath(storeID)) {
+		CreateDir(Config.GetImageCookingOriginPath(storeID))
+	}
+	if !CheckFilePathExists(Config.GetImageCookingOriginLogoPath(storeID)) {
+		CreateDir(Config.GetImageCookingOriginLogoPath(storeID))
+		if !CheckFilePathExists(Config.GetImageCookingLargePath(storeID)) {
+			CreateDir(Config.GetImageCookingLargePath(storeID))
+		}
+	}
+	if !CheckFilePathExists(Config.GetImageCookingMediumPath(storeID)) {
+		CreateDir(Config.GetImageCookingMediumPath(storeID))
+	}
+	if !CheckFilePathExists(Config.GetImageCookingSmallPath(storeID)) {
+		CreateDir(Config.GetImageCookingSmallPath(storeID))
+	}
+	if !CheckFilePathExists(Config.GetImageCookingMicroPath(storeID)) {
+		CreateDir(Config.GetImageCookingMicroPath(storeID))
+	}
+
+	//other
+	if !CheckFilePathExists(Config.GetImageOtherOriginPath(storeID)) {
+		CreateDir(Config.GetImageOtherOriginPath(storeID))
+	}
+	if !CheckFilePathExists(Config.GetImageOtherOriginLogoPath(storeID)) {
+		CreateDir(Config.GetImageOtherOriginLogoPath(storeID))
+	}
+	if !CheckFilePathExists(Config.GetImageOtherLargePath(storeID)) {
+		CreateDir(Config.GetImageOtherLargePath(storeID))
+	}
+	if !CheckFilePathExists(Config.GetImageOtherMediumPath(storeID)) {
+		CreateDir(Config.GetImageOtherMediumPath(storeID))
+	}
+	if !CheckFilePathExists(Config.GetImageOtherSmallPath(storeID)) {
+		CreateDir(Config.GetImageOtherSmallPath(storeID))
+	}
+	if !CheckFilePathExists(Config.GetImageOtherMicroPath(storeID)) {
+		CreateDir(Config.GetImageOtherMicroPath(storeID))
+	}
+}
