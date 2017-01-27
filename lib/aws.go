@@ -10,9 +10,12 @@ import (
 
 	"strconv"
 
+	"fmt"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
@@ -64,6 +67,51 @@ func NewAws() *AwsIni {
 //
 //}
 
+//DeleteS3Image delete s3 images
+func (this *AwsIni) DeleteS3Images(imgIDs []int) {
+
+	var targetI []*s3.ObjectIdentifier
+	for _, id := range imgIDs {
+		i := &s3.ObjectIdentifier{}
+		i.SetKey(strconv.Itoa(id) + "." + SaveImageExt)
+
+		targetI = append(targetI, i)
+	}
+
+	if len(imgIDs) == 0 {
+		return
+	}
+
+	svc := s3.New(this.getSession())
+	params := &s3.DeleteObjectsInput{
+		Bucket: aws.String(Config.Aws.GetAwsBucketName()),
+		Delete: &s3.Delete{
+			Objects: targetI,
+			Quiet:   aws.Bool(true),
+		},
+	}
+	resp, err := svc.DeleteObjects(params)
+
+	if err != nil {
+		fmt.Println(resp)
+		FatalExit(err.Error())
+	}
+}
+
+// getSession return aws session
+func (this *AwsIni) getSession() *session.Session {
+	sess, err := session.NewSession(&aws.Config{
+		Region:      aws.String("ap-northeast-1"),
+		Credentials: credentials.NewStaticCredentials(this.AccessKeyID, this.SecretAccessKey, ""),
+	})
+
+	if err != nil {
+		FatalExit("aws session生成に失敗")
+	}
+
+	return sess
+}
+
 //SaveImageToS3 is save image to s3 object
 func (this *AwsIni) SaveImageToS3(imgID int, img image.Image, imgQuality int, public bool) {
 	var opt jpeg.Options
@@ -74,15 +122,7 @@ func (this *AwsIni) SaveImageToS3(imgID int, img image.Image, imgQuality int, pu
 		log.Println("unable to encode image.")
 	}
 
-	sess, err := session.NewSession(&aws.Config{
-		Region:      aws.String("ap-northeast-1"),
-		Credentials: credentials.NewStaticCredentials(this.AccessKeyID, this.SecretAccessKey, ""),
-	})
-
-	if err != nil {
-		FatalExit(err)
-	}
-
+	sess := this.getSession()
 	uploader := s3manager.NewUploader(sess)
 
 	s3Input := &s3manager.UploadInput{
@@ -96,7 +136,7 @@ func (this *AwsIni) SaveImageToS3(imgID int, img image.Image, imgQuality int, pu
 		s3Input.ACL = aws.String("public-read")
 	}
 
-	_, err = uploader.Upload(s3Input)
+	_, err := uploader.Upload(s3Input)
 
 	if err != nil {
 		FatalExit(err)

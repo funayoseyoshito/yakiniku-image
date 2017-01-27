@@ -55,6 +55,7 @@ func main() {
 		f.IntVar(&optionID, "image", 0, "delete origin ID")
 		f.Parse(os.Args[2:])
 		checkOptionEmpty(lib.CmdOptionStore)
+		lib.DeleteExecute(optionID, dbSet, awsSet)
 
 	default:
 		lib.FatalExit("コマンドを確認してください")
