@@ -64,6 +64,8 @@ func InsertExecute(storeID int, dbSet *db.DatabaseSet, awsSet *AwsIni) {
 			//update origin_id
 			imageTable.OriginID = originId
 			dbSet.Connection().Save(&imageTable)
+			dbSet.Connection().Create(&db.ImageDescriptions{OriginID: originId})
+
 			//save to s3
 			awsSet.SaveImageToS3(originId, mixedOriginImg, SaveImageQuality50, S3ACLPublic)
 			SaveImageToFile(mixedOriginImg, kind, imageTable.ID, storeID)
